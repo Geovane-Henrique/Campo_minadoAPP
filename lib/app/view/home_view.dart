@@ -17,20 +17,30 @@ class _HomeViewState extends State<HomeView> {
     campo = Ezcampo();
   }
 
+//acionado sempre que uma casa e apertada
+//deve ser otimizado em breve
   void attButton(int rowIndex, int cowIndex) {
     setState(() {
       campo.createEzmpa(rowIndex, cowIndex);
       campo.updateColor(rowIndex, cowIndex);
       campo.revealZero(rowIndex, cowIndex);
       if (campo.getValue(rowIndex, cowIndex) == 500) {
+        campo.showMinas();
         gameOver();
-        campo.resetEzMap();
       }
     });
   }
 
+//reseta o mapa
+  void resetMap() {
+    campo.resetEzMap();
+    setState(() {});
+  }
+
+//aparece um dialog quando uma mina e apertada
   void gameOver() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -38,7 +48,10 @@ class _HomeViewState extends State<HomeView> {
           content: Text("bomba"),
           actions: <Widget>[
             TextButton(
-                onPressed: Navigator.of(context).pop,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  resetMap();
+                },
                 child: Text("Tentar novamente"))
           ],
         );
@@ -51,22 +64,32 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
-          title: null,
-          flexibleSpace: const Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: EdgeInsets.only(right: 100),
-              child: Text(
+          title: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 60),
+                //botao de reset
+                //reseta o mapa com a partida ainda em curso
+                child: ElevatedButton(
+                    onPressed: () {
+                      resetMap();
+                    },
+                    child: Icon(Icons.refresh)),
+              ),
+              const Text(
                 "campo minado",
                 style: TextStyle(fontSize: 30),
               ),
-            ),
+            ],
           ),
         ),
+        //cria o mapa externo
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: List.generate(
               12,
               (rowIndex) {
@@ -77,6 +100,7 @@ class _HomeViewState extends State<HomeView> {
                     6,
                     (cowIndex) {
                       return Center(
+                          //a casa e seus comportamentos
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 shape: const RoundedRectangleBorder(
@@ -93,22 +117,34 @@ class _HomeViewState extends State<HomeView> {
                               onPressed: () {
                                 attButton(rowIndex, cowIndex);
                               },
-                              child: AnimatedOpacity(
-                                opacity: campo.getValue(rowIndex, cowIndex) != 0
-                                    ? 1.0
-                                    : 0.0,
+                              child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 300),
-                                child: Text(
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontSize: 30,
-                                    ),
+                                child:
+                                    //caso o valor for diferente de 0 a cor for igual a verde e o valor for diferente de 500
                                     campo.getValue(rowIndex, cowIndex) != 0 &&
                                             campo.getColor(
                                                     rowIndex, cowIndex) ==
-                                                Colors.green
-                                        ? "${campo.getValue(rowIndex, cowIndex)}"
-                                        : ""),
+                                                const Color.fromARGB(
+                                                    255, 120, 163, 78) &&
+                                            campo.getValue(
+                                                    rowIndex, cowIndex) !=
+                                                500
+                                        //o valor da casa sera exibido na casa
+                                        ? Text(
+                                            "${campo.getValue(rowIndex, cowIndex)}",
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontSize: 30,
+                                            ),
+                                            key: ValueKey<int?>(campo.getValue(
+                                                rowIndex, cowIndex)),
+                                          ) //caso nao siginifica que apertou uma mina entao as casas exibem o icon de warnig
+                                        //o icon sera mudado
+                                        : Icon(
+                                            campo.getIcon(rowIndex, cowIndex),
+                                            key: ValueKey<String>(
+                                                'icon_${rowIndex}_${cowIndex}'),
+                                          ),
                               )));
                     },
                   ),
