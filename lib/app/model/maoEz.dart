@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 class Ezcampo {
   List<List<Map<String, dynamic>>> mapaez;
   int end = 0;
+  int row;
+  int cow;
+  int mina = 10;
 
   Random random = Random();
 
-  Ezcampo()
-      : mapaez = List.generate(12, (rowIndex) {
-          return List.generate(6, (cowIndex) {
+  Ezcampo({required this.row, required this.cow})
+      : mapaez = List.generate(row, (rowIndex) {
+          return List.generate(cow, (cowIndex) {
             return {
               "name": rowIndex * 6 + cowIndex + 1,
               "value": 0,
@@ -19,6 +22,21 @@ class Ezcampo {
             };
           });
         });
+//atualiza o mapa
+  void updateMap(int newRow, int newCow) {
+    row = newRow;
+    cow = newCow;
+    mapaez = List.generate(row, (rowIndex) {
+      return List.generate(cow, (cowIndex) {
+        return {
+          "name": rowIndex * 6 + cowIndex + 1,
+          "value": 0,
+          "color": Colors.blue,
+          "icon": null
+        };
+      });
+    });
+  }
 
 // retorna o nome foi (usado para teste)
   int getName(int rowIndex, int cowIndex) {
@@ -28,6 +46,10 @@ class Ezcampo {
   //retorna a cor do background das casas
   Color getColor(int rowIndex, int cowIndex) {
     return mapaez[rowIndex][cowIndex]["color"];
+  }
+
+  void updateMina(int newMina) {
+    mina = newMina;
   }
 
   //atualiza a cor da casa apos o click
@@ -61,9 +83,9 @@ class Ezcampo {
           int checkColumn = cowIndex + c;
 // garante que a casa a ser verificada existe
           if (checkRow >= 0 &&
-              checkRow < 12 &&
+              checkRow < row &&
               checkColumn >= 0 &&
-              checkColumn < 6) {
+              checkColumn < cow) {
             //se a casa verificada tiver o valor de zero e sua cor for azul o procedimeno entra em loop(a cor e precisa para que o loop seja finito e ele não verifique casas ja reveladas)
             if (mapaez[checkRow][checkColumn]["value"] == 0 &&
                 mapaez[checkRow][checkColumn]["color"] == Colors.blue) {
@@ -98,18 +120,18 @@ class Ezcampo {
           int columnMarking = c + lc;
           //garante que a casa existe
           if (rowMarking >= 0 &&
-              rowMarking < 12 &&
+              rowMarking < row &&
               //define a linha e coluna da casa a ser revelada
               columnMarking >= 0 &&
-              columnMarking < 6) {
+              columnMarking < cow) {
             mapaez[rowMarking][columnMarking]["value"] = 100;
           }
         }
       }
       //cria 10 minas aleatoriamente(valor 5 = mina)
-      for (int i = 1; i <= 10; i) {
-        int linha = random.nextInt(12);
-        int coluna = random.nextInt(6);
+      for (int i = 1; i <= mina; i) {
+        int linha = random.nextInt(row);
+        int coluna = random.nextInt(cow);
         //varifica se a casa nao tem nenhum valor atribuido ainda(as casas ao redir da inicial tem valor 100 e as casas com minas tem valor 500)
         if (mapaez[linha][coluna]["value"] == 0) {
           //atribui o valor de uma mina a casa
@@ -118,8 +140,8 @@ class Ezcampo {
         }
       }
       //olha todas as casas do mapa para atribuir valor as casas com minas ao redor
-      for (int i = 0; i < 12; ++i) {
-        for (int l = 0; l < 6; ++l) {
+      for (int i = 0; i < row; ++i) {
+        for (int l = 0; l < cow; ++l) {
           //as casas com valor 100 tem seu valor alterado para 0
           if (mapaez[i][l]["value"] == 100) {
             mapaez[i][l]["value"] = 0;
@@ -134,9 +156,9 @@ class Ezcampo {
                 int columncount = l + lc;
                 //verifica se a casa existe
                 if (rowcount >= 0 &&
-                    rowcount < 12 &&
+                    rowcount < row &&
                     columncount >= 0 &&
-                    columncount < 6) {
+                    columncount < cow) {
                   //caso a casa ao redor tenha o valor de 500(mina) e lhe atribuido o valor de +1
                   //acontece 9 vezes e determina o valor final da casa
                   //se tiver 4 minas ao redor o valor sera 4
@@ -157,8 +179,8 @@ class Ezcampo {
 //reseta todos os valores das casas
 //basicamente reseta o mapa
   void resetEzMap() {
-    for (int i = 0; i <= 11; ++i) {
-      for (int l = 0; l <= 5; ++l) {
+    for (int i = 0; i < row; ++i) {
+      for (int l = 0; l < cow; ++l) {
         mapaez[i][l]["value"] = 0;
         mapaez[i][l]["icon"] = null;
         mapaez[i][l]["color"] = Colors.blue;
@@ -171,8 +193,8 @@ class Ezcampo {
 //e chamado quando uma mina e apertada entao lhe atribui o icon de warnig a todas elas
 //todas as minas sao reveladas quando ganham um icon
   void showMinas() {
-    for (int i = 0; i <= 11; ++i) {
-      for (int l = 0; l <= 5; ++l) {
+    for (int i = 0; i < row; ++i) {
+      for (int l = 0; l < cow; ++l) {
         if (mapaez[i][l]["value"] == 500) {
           mapaez[i][l]["icon"] = Icons.warning;
         }

@@ -1,5 +1,9 @@
-import 'package:campominado/app/model/campo_model.dart';
+import 'package:campominado/app/model/maoEz.dart';
+
+import 'package:campominado/app/view/maps_view.dart';
 import 'package:flutter/material.dart';
+
+import 'gameOverDialog_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,10 +15,12 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   late Ezcampo campo;
 
+  late int? selectDif = 1;
+
   @override
   void initState() {
     super.initState();
-    campo = Ezcampo();
+    campo = Ezcampo(row: 12, cow: 6);
   }
 
 //acionado sempre que uma casa e apertada
@@ -37,121 +43,102 @@ class _HomeViewState extends State<HomeView> {
     setState(() {});
   }
 
+  void updateMap() {
+    setState(() {
+      if (selectDif == 1) {
+        campo.updateMina(10);
+        campo.updateMap(12, 6);
+      }
+      if (selectDif == 2) {
+        campo.updateMina(35);
+        campo.updateMap(20, 10);
+      }
+
+      if (selectDif == 3) {
+        campo.updateMina(75);
+        campo.updateMap(27, 13);
+      }
+    });
+  }
+
 //aparece um dialog quando uma mina e apertada
   void gameOver() {
     showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Game over"),
-          content: Text("bomba"),
-          actions: <Widget>[
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  resetMap();
-                },
-                child: Text("Tentar novamente"))
-          ],
-        );
-      },
-    );
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return gameOverDialog(resetMap: resetMap);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 60),
-                //botao de reset
-                //reseta o mapa com a partida ainda em curso
-                child: ElevatedButton(
-                    onPressed: () {
+        appBar: PreferredSize(
+          preferredSize: Size(screenWidth, screenHeight * 0.08),
+          child: AppBar(
+            backgroundColor: Colors.black,
+            title: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DropdownButton<int>(
+                  hint: Text("escolha uma dificuldade"),
+                  value: selectDif,
+                  onChanged: (int? newvalue) {
+                    setState(() {
+                      selectDif = newvalue;
+                      updateMap();
                       resetMap();
-                    },
-                    child: Icon(Icons.refresh)),
-              ),
-              const Text(
-                "campo minado",
-                style: TextStyle(fontSize: 30),
-              ),
-            ],
-          ),
-        ),
-        //cria o mapa externo
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: List.generate(
-              12,
-              (rowIndex) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(
-                    6,
-                    (cowIndex) {
-                      return Center(
-                          //a casa e seus comportamentos
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero,
-                                ),
-                                fixedSize: const Size(55, 55),
-                                maximumSize: Size(55, 55),
-                                minimumSize: Size(55, 55),
-                                backgroundColor:
-                                    campo.getColor(rowIndex, cowIndex),
-                                side: const BorderSide(
-                                    color: Color.fromARGB(255, 12, 11, 11)),
-                              ),
-                              onPressed: () {
-                                attButton(rowIndex, cowIndex);
-                              },
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                child:
-                                    //caso o valor for diferente de 0 a cor for igual a verde e o valor for diferente de 500
-                                    campo.getValue(rowIndex, cowIndex) != 0 &&
-                                            campo.getColor(
-                                                    rowIndex, cowIndex) ==
-                                                const Color.fromARGB(
-                                                    255, 120, 163, 78) &&
-                                            campo.getValue(
-                                                    rowIndex, cowIndex) !=
-                                                500
-                                        //o valor da casa sera exibido na casa
-                                        ? Text(
-                                            "${campo.getValue(rowIndex, cowIndex)}",
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontSize: 30,
-                                            ),
-                                            key: ValueKey<int?>(campo.getValue(
-                                                rowIndex, cowIndex)),
-                                          ) //caso nao siginifica que apertou uma mina entao as casas exibem o icon de warnig
-                                        //o icon sera mudado
-                                        : Icon(
-                                            campo.getIcon(rowIndex, cowIndex),
-                                            key: ValueKey<String>(
-                                                'icon_${rowIndex}_${cowIndex}'),
-                                          ),
-                              )));
-                    },
-                  ),
-                );
-              },
+                      updateMap();
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem<int>(child: Text("facil"), value: 1),
+                    DropdownMenuItem<int>(child: Text("medio"), value: 2),
+                    DropdownMenuItem<int>(child: Text("dificil"), value: 3),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 60),
+                  //botao de reset
+                  //reseta o mapa com a partida ainda em curso
+                  child: ElevatedButton(
+                      onPressed: () {
+                        resetMap();
+                      },
+                      child: Icon(Icons.refresh)),
+                ),
+              ],
             ),
           ),
-        ));
+        ),
+
+        //cria o mapa externo
+        body: selectDif == 1
+            ? map(
+                campo: campo,
+                attButton: attButton,
+                c: 12,
+                r: 6,
+                selectDif: 1,
+              )
+            : selectDif == 2
+                ? map(
+                    campo: campo,
+                    attButton: attButton,
+                    c: 20,
+                    r: 10,
+                    selectDif: 2,
+                  )
+                : map(
+                    campo: campo,
+                    attButton: attButton,
+                    c: 27,
+                    r: 13,
+                    selectDif: 3,
+                  ));
   }
 }
