@@ -30,11 +30,36 @@ class _HomeViewState extends State<HomeView> {
       campo.createEzmpa(rowIndex, cowIndex);
       campo.updateColor(rowIndex, cowIndex);
       campo.revealZero(rowIndex, cowIndex);
+
       if (campo.getValue(rowIndex, cowIndex) == 500) {
         campo.showMinas();
         gameOver();
       }
+      if (campo.winGame() == 1) {
+        winDialog();
+      }
     });
+  }
+
+  void winDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("win"),
+          content: Text("Parabéns soldado"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                resetMap();
+              },
+              child: Text("jogar novamente"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 //reseta o mapa

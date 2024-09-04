@@ -8,6 +8,7 @@ class Ezcampo {
   int row;
   int cow;
   int mina = 10;
+  int win = 0;
 
   Random random = Random();
 
@@ -196,9 +197,24 @@ class Ezcampo {
     for (int i = 0; i < row; ++i) {
       for (int l = 0; l < cow; ++l) {
         if (mapaez[i][l]["value"] == 500) {
-          mapaez[i][l]["icon"] = Icons.warning;
+          mapaez[i][l]["icon"] = Icons.warning_outlined;
         }
       }
     }
+  }
+
+  int winGame() {
+    for (int i = 0; i < row; ++i) {
+      for (int l = 0; l < cow; ++l) {
+        if (mapaez[i][l]["color"] == Colors.blue) {
+          ++win;
+        }
+      }
+    }
+    if (win == mina) {
+      return 1;
+    }
+    win = 0;
+    return 0;
   }
 }

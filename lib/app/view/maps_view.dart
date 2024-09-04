@@ -56,7 +56,10 @@ class map extends StatelessWidget {
                             width: width,
                             height: height,
                             rowIndex: rowIndex,
-                            cowIndex: cowIndex)
+                            cowIndex: cowIndex,
+                            size: 25,
+                            fontsize: 30,
+                          )
                         : selectDif == 2
                             ? casaView(
                                 campo: campo,
@@ -64,14 +67,18 @@ class map extends StatelessWidget {
                                 width: width,
                                 height: height,
                                 rowIndex: rowIndex,
-                                cowIndex: cowIndex)
+                                cowIndex: cowIndex,
+                                size: 10,
+                                fontsize: 15)
                             : casaView(
                                 campo: campo,
                                 attButton: attButton,
                                 width: width,
                                 height: height,
                                 rowIndex: rowIndex,
-                                cowIndex: cowIndex);
+                                cowIndex: cowIndex,
+                                size: 7,
+                                fontsize: 10);
                   },
                 ),
               );
