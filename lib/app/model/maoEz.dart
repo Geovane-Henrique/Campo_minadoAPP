@@ -203,6 +203,7 @@ class Ezcampo {
     }
   }
 
+//verifica se existem apena minas nas casaa
   int winGame() {
     for (int i = 0; i < row; ++i) {
       for (int l = 0; l < cow; ++l) {

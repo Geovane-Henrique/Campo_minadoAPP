@@ -32,9 +32,12 @@ class map extends StatelessWidget {
       } else if (selectDif == 2) {
         width = constraints.maxWidth / 10;
         height = constraints.maxHeight / 20;
-      } else {
+      } else if (selectDif == 3) {
         width = constraints.maxWidth / 13;
         height = constraints.maxHeight / 27;
+      } else {
+        width = constraints.maxWidth / c;
+        height = constraints.maxHeight / r;
       }
       return Center(
         child: Column(
@@ -70,15 +73,25 @@ class map extends StatelessWidget {
                                 cowIndex: cowIndex,
                                 size: 10,
                                 fontsize: 15)
-                            : casaView(
-                                campo: campo,
-                                attButton: attButton,
-                                width: width,
-                                height: height,
-                                rowIndex: rowIndex,
-                                cowIndex: cowIndex,
-                                size: 7,
-                                fontsize: 10);
+                            : selectDif == 3
+                                ? casaView(
+                                    campo: campo,
+                                    attButton: attButton,
+                                    width: width,
+                                    height: height,
+                                    rowIndex: rowIndex,
+                                    cowIndex: cowIndex,
+                                    size: 7,
+                                    fontsize: 10)
+                                : casaView(
+                                    campo: campo,
+                                    attButton: attButton,
+                                    width: width,
+                                    height: height,
+                                    rowIndex: rowIndex,
+                                    cowIndex: cowIndex,
+                                    size: 7,
+                                    fontsize: 10);
                   },
                 ),
               );

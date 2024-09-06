@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 
 class gameOverDialog extends StatelessWidget {
   final VoidCallback resetMap;
-  const gameOverDialog({super.key, required this.resetMap});
+  final int showTime;
+  const gameOverDialog(
+      {super.key, required this.resetMap, required this.showTime});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Game over"),
-      content: Text("bomba"),
+      content: Text("$showTime segundos"),
       actions: <Widget>[
         TextButton(
             onPressed: () {
